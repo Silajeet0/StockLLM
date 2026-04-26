@@ -1,0 +1,22 @@
+{
+  "model": "TFT",
+  "predicted_prices": [
+    1444.1552,
+    1446.349,
+    1443.8271,
+    1440.2242,
+    1435.1582
+  ],
+  "trend": "Bullish",
+  "confidence": 0.9483,
+  "important_features": [
+    "month",
+    "ema_20",
+    "sma_20",
+    "low",
+    "high"
+  ],
+  "last_actual_price": 1343.4001,
+  "val_mae": 37.4231,
+  "val_rmse": 46.29
+}

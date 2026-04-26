@@ -1,0 +1,79 @@
+{
+  "run_id": "0DEBC28A",
+  "timestamp": "2026-04-19T18:33:04.797968+00:00",
+  "ticker": "RELIANCE.NS",
+  "company": "Reliance Industries Limited",
+  "last_price": 1365.0,
+  "models": {
+    "itransformer": {
+      "model": "iTransformer",
+      "predicted_prices": [
+        1326.7841,
+        1318.6156,
+        1289.4158,
+        1302.2064,
+        1292.5608
+      ],
+      "trend": "Bearish",
+      "confidence": 0.8822,
+      "signal_strength": null,
+      "important_features": [
+        "volatility",
+        "macd_signal",
+        "returns",
+        "high",
+        "close"
+      ],
+      "val_mae": 85.1844,
+      "val_rmse": 100.0224,
+      "last_actual_price": 1365.0
+    },
+    "tft": {
+      "model": "TFT",
+      "predicted_prices": [
+        1391.2463,
+        1391.9559,
+        1389.7751,
+        1386.7194,
+        1383.6415
+      ],
+      "trend": "Bullish",
+      "confidence": 0.9347,
+      "signal_strength": null,
+      "important_features": [
+        "open",
+        "macd_hist",
+        "ema_20",
+        "rsi",
+        "volatility"
+      ],
+      "val_mae": 47.2378,
+      "val_rmse": 57.9284,
+      "last_actual_price": 1365.0
+    }
+  },
+  "news": {
+    "sentiment_label": "Neutral",
+    "sentiment_score": 0.032,
+    "headline_summary": "How The Story On Reliance Industries (NSEI:RELIANCE) Is Shifting As Analysts Rework Fair Value | HBO Max comes to India via exclusive JioHotstar deal | India permits Iranian oil tankers to berth for Reliance, sources say",
+    "num_articles": 30
+  },
+  "llm_interpretation": {
+    "signal": "BUY",
+    "final_trend": "Bullish",
+    "confidence": 0.798,
+    "price_target": 1421.11,
+    "explanation": "The models agree on a bullish trend, with Model 2 having a substantially lower validation error than Model 1. The news sentiment analysis is neutral, but the recent headlines suggest a positive shift in analyst views and a potential exclusive deal for Reliance Industries, which could boost investor confidence.",
+    "model_agreement": false,
+    "key_risks": "The main risk to this prediction is that the bullish trend may be short-lived due to global market volatility or unforeseen company-specific issues."
+  },
+  "consensus": {
+    "signal": "HOLD",
+    "trend": "Sideways",
+    "confidence": 0.7107,
+    "price_target": 1365.77,
+    "agreement": false
+  },
+  "status": "success",
+  "errors": []
+}

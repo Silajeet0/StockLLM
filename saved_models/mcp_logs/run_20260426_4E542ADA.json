@@ -1,0 +1,79 @@
+{
+  "run_id": "4E542ADA",
+  "timestamp": "2026-04-26T15:41:21.795287+00:00",
+  "ticker": "RELIANCE.NS",
+  "company": "Reliance Industries Limited",
+  "last_price": 1343.4,
+  "models": {
+    "itransformer": {
+      "model": "iTransformer",
+      "predicted_prices": [
+        1291.4515,
+        1253.6233,
+        1313.5619,
+        1287.088,
+        1310.2662
+      ],
+      "trend": "Bearish",
+      "confidence": 0.8781,
+      "signal_strength": null,
+      "important_features": [
+        "macd_signal",
+        "macd",
+        "returns",
+        "adj_close",
+        "macd_hist"
+      ],
+      "val_mae": 88.1699,
+      "val_rmse": 105.5305,
+      "last_actual_price": 1343.4
+    },
+    "tft": {
+      "model": "TFT",
+      "predicted_prices": [
+        1444.1552,
+        1446.349,
+        1443.8271,
+        1440.2242,
+        1435.1582
+      ],
+      "trend": "Bullish",
+      "confidence": 0.9483,
+      "signal_strength": null,
+      "important_features": [
+        "month",
+        "ema_20",
+        "sma_20",
+        "low",
+        "high"
+      ],
+      "val_mae": 37.4231,
+      "val_rmse": 46.29,
+      "last_actual_price": 1343.4001
+    }
+  },
+  "news": {
+    "sentiment_label": "Negative",
+    "sentiment_score": -0.5241,
+    "headline_summary": "Ambani's Reliance posts quarterly profit drop, misses street view | Indian court extends detention of aviation official, Reliance exec in bribery case | Factbox-India's Asteria, the Reliance unit at the centre of a bribery scandal",
+    "num_articles": 30
+  },
+  "llm_interpretation": {
+    "signal": "HOLD",
+    "final_trend": "Sideways",
+    "confidence": 0.6861,
+    "price_target": 1343.4,
+    "explanation": "The models disagree on direction, and the combined rule-based confidence is relatively low. The news sentiment analysis indicates a negative overall sentiment, but this does not strongly influence the model predictions. Given the mixed signals, a cautious approach is recommended.",
+    "model_agreement": false,
+    "key_risks": "The main risk to this prediction is that the models' disagreement may be due to overfitting or underfitting, and the actual trend may differ from their predictions."
+  },
+  "consensus": {
+    "signal": "HOLD",
+    "trend": "Sideways",
+    "confidence": 0.5832,
+    "price_target": 1362.94,
+    "agreement": false
+  },
+  "status": "success",
+  "errors": []
+}

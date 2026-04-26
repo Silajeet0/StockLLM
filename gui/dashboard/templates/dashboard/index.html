@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StockLLM — AI Market Intelligence</title>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+/* ─── CSS Variables ────────────────────────────────────────── */
+:root {
+  --bg:          #080b14;
+  --bg2:         #0d1221;
+  --bg3:         #111827;
+  --card:        #111827;
+  --card2:       #1a2236;
+  --border:      #1e2d47;
+  --cyan:        #00d4ff;
+  --cyan-dim:    rgba(0,212,255,0.15);
+  --green:       #00ff88;
+  --green-dim:   rgba(0,255,136,0.12);
+  --red:         #ff4466;
+  --red-dim:     rgba(255,68,102,0.12);
+  --purple:      #a855f7;
+  --purple-dim:  rgba(168,85,247,0.12);
+  --amber:       #f59e0b;
+  --amber-dim:   rgba(245,158,11,0.12);
+  --blue:        #3b82f6;
+  --blue-dim:    rgba(59,130,246,0.12);
+  --text:        #e2e8f0;
+  --text-dim:    #94a3b8;
+  --text-muted:  #475569;
+  --glow-cyan:   0 0 20px rgba(0,212,255,0.3);
+  --glow-green:  0 0 20px rgba(0,255,136,0.3);
+  --glow-red:    0 0 20px rgba(255,68,102,0.3);
+  --glow-purple: 0 0 20px rgba(168,85,247,0.3);
+  --radius:      12px;
+  --radius-lg:   18px;
+}
+
+/* ─── Reset & Base ─────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ─── Animated Background ──────────────────────────────────── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(0,212,255,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(168,85,247,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 50% 50%, rgba(0,255,136,0.02) 0%, transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* ─── Layout ───────────────────────────────────────────────── */
+.container{max-width:1440px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+/* ─── Header ───────────────────────────────────────────────── */
+header{
+  padding:20px 0 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  background:rgba(8,11,20,0.92);backdrop-filter:blur(16px);
+}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;box-shadow:var(--glow-cyan);
+  animation:pulse-logo 3s ease-in-out infinite;
+}
+@keyframes pulse-logo{
+  0%,100%{box-shadow:0 0 15px rgba(0,212,255,0.4)}
+  50%{box-shadow:0 0 30px rgba(0,212,255,0.7),0 0 50px rgba(168,85,247,0.3)}
+}
+.logo h1{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.logo h1 span{
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.header-meta{font-size:12px;color:var(--text-muted)}
+.header-meta span{color:var(--cyan)}
+
+/* ─── Main Grid ────────────────────────────────────────────── */
+.main-grid{
+  display:grid;
+  grid-template-columns:300px 1fr;
+  gap:24px;
+  padding:24px 0;
+  min-height:calc(100vh - 90px);
+}
+
+/* ─── Sidebar ──────────────────────────────────────────────── */
+.sidebar{display:flex;flex-direction:column;gap:16px}
+
+/* ─── Cards ─────────────────────────────────────────────────── */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:20px;
+  transition:border-color .3s;
+}
+.card:hover{border-color:rgba(0,212,255,0.3)}
+.card-title{
+  font-size:11px;font-weight:700;letter-spacing:1.5px;
+  color:var(--text-muted);text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-title::before{
+  content:'';width:3px;height:14px;border-radius:2px;
+  background:linear-gradient(180deg,var(--cyan),var(--purple));
+}
+
+/* ─── Stock Info Card ────────────────────────────────────────── */
+.stock-info-card {
+  background: linear-gradient(135deg, rgba(0,212,255,0.06), rgba(168,85,247,0.04));
+  border: 1px solid rgba(0,212,255,0.3);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--glow-cyan);
+}
+.stock-ticker-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.ticker-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.ticker-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.ticker-sym  { font-size: 12px; color: var(--cyan); font-weight: 600; margin-top: 2px; }
+.stock-meta-row {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;
+}
+.stock-meta-tag {
+  font-size: 10px; padding: 3px 10px; border-radius: 20px;
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+/* ─── Predict Button ────────────────────────────────────────── */
+.run-btn{
+  width:100%;padding:16px;border-radius:10px;border:none;cursor:pointer;
+  font-size:16px;font-weight:700;letter-spacing:0.5px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  color:#fff;position:relative;overflow:hidden;
+  transition:transform .2s,box-shadow .2s;
+}
+.run-btn:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(0,212,255,0.4);
+}
+.run-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.run-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.1),transparent);
+}
+.run-btn.running{
+  animation:btn-pulse 1.5s ease-in-out infinite;
+}
+@keyframes btn-pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,0.4)}
+  50%{box-shadow:0 0 0 10px rgba(0,212,255,0)}
+}
+
+/* ─── Progress Section ──────────────────────────────────────── */
+.progress-section{display:none}
+.progress-section.visible{display:block}
+.overall-progress{margin-bottom:16px}
+.overall-label{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;color:var(--text-dim);margin-bottom:6px;
+}
+.overall-label strong{color:var(--cyan);font-size:14px}
+.progress-bar-track{
+  height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;
+}
+.progress-bar-fill{
+  height:100%;border-radius:3px;transition:width 0.5s ease;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));
+  position:relative;
+}
+.progress-bar-fill::after{
+  content:'';position:absolute;top:0;right:0;bottom:0;width:40px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);
+  animation:shimmer 1.5s infinite;
+}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+
+.stage-list{display:flex;flex-direction:column;gap:10px}
+.stage-item{padding:10px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border)}
+.stage-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.stage-name{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+.stage-status-dot{width:7px;height:7px;border-radius:50%;background:var(--text-muted)}
+.stage-status-dot.running{background:var(--amber);animation:blink 1s infinite}
+.stage-status-dot.complete{background:var(--green)}
+.stage-status-dot.error{background:var(--red)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.stage-pct{font-size:11px;color:var(--text-muted)}
+.stage-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.stage-bar-fill{height:100%;border-radius:2px;transition:width 0.4s ease}
+.stage-message{font-size:10px;color:var(--text-muted);margin-top:4px;min-height:14px}
+
+/* Stage bar colors */
+.stage-bar-fill.data_download{background:var(--cyan)}
+.stage-bar-fill.feature_eng{background:var(--blue)}
+.stage-bar-fill.itransformer{background:var(--purple)}
+.stage-bar-fill.tft{background:var(--amber)}
+.stage-bar-fill.news{background:var(--green)}
+.stage-bar-fill.orchestrator{background:linear-gradient(90deg,var(--cyan),var(--green))}
+
+/* ─── Log Console ───────────────────────────────────────────── */
+.log-console{
+  background:#050810;border:1px solid var(--border);
+  border-radius:8px;padding:12px;font-family:'Courier New',monospace;
+  font-size:11px;color:#64748b;max-height:160px;overflow-y:auto;
+  line-height:1.6;
+}
+.log-console::-webkit-scrollbar{width:4px}
+.log-console::-webkit-scrollbar-track{background:transparent}
+.log-console::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.log-line{white-space:pre-wrap;word-break:break-all}
+.log-line.info{color:#64748b}
+.log-line.success{color:#00ff88}
+.log-line.warning{color:#f59e0b}
+.log-line.error{color:#ff4466}
+
+/* ─── Content Area ──────────────────────────────────────────── */
+.content-area{display:flex;flex-direction:column;gap:20px}
+
+/* ─── OHLC Chart ────────────────────────────────────────────── */
+.ohlc-card{
+  border:1px solid var(--border);border-radius:var(--radius-lg);
+  background:var(--card);overflow:hidden;
+}
+.ohlc-header{
+  padding:16px 20px;
+  background:linear-gradient(135deg,rgba(0,212,255,0.05),rgba(168,85,247,0.05));
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.ohlc-header h2{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.ohlc-header h2 .ticker-badge{
+  font-size:12px;background:var(--cyan-dim);color:var(--cyan);
+  padding:3px 10px;border-radius:20px;border:1px solid rgba(0,212,255,0.3);
+}
+.ohlc-hint{font-size:11px;color:var(--text-muted)}
+#ohlc-chart{height:320px;background:transparent}
+.ohlc-placeholder{
+  height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--text-muted);gap:12px;font-size:14px;
+}
+.ohlc-placeholder .icon{font-size:40px;opacity:0.4}
+
+/* ─── Output Section ────────────────────────────────────────── */
+.output-section{display:none}
+.output-section.visible{display:block}
+.output-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ─── Output Box ────────────────────────────────────────────── */
+.output-box{
+  border-radius:var(--radius-lg);padding:0;overflow:hidden;
+  transition:transform .2s,box-shadow .3s;
+}
+.output-box:hover{transform:translateY(-2px)}
+.output-box.itransformer{
+  border:1px solid rgba(168,85,247,0.5);
+  box-shadow:0 0 20px rgba(168,85,247,0.1);
+  background:linear-gradient(135deg,rgba(168,85,247,0.05),rgba(0,212,255,0.03));
+}
+.output-box.tft{
+  border:1px solid rgba(245,158,11,0.5);
+  box-shadow:0 0 20px rgba(245,158,11,0.1);
+  background:linear-gradient(135deg,rgba(245,158,11,0.05),rgba(0,212,255,0.03));
+}
+.output-box.final{
+  border:1px solid rgba(0,212,255,0.6);
+  box-shadow:0 0 30px rgba(0,212,255,0.15),inset 0 0 30px rgba(0,212,255,0.02);
+  background:linear-gradient(135deg,rgba(0,212,255,0.06),rgba(168,85,247,0.04));
+}
+.output-box.news-box{
+  border:1px solid rgba(0,255,136,0.4);
+  box-shadow:0 0 20px rgba(0,255,136,0.08);
+  background:linear-gradient(135deg,rgba(0,255,136,0.04),rgba(59,130,246,0.03));
+}
+.output-box-header{
+  padding:12px 18px;border-bottom:1px solid rgba(255,255,255,0.06);
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(0,0,0,0.2);
+}
+.output-box-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.model-badge{
+  font-size:10px;padding:3px 10px;border-radius:20px;font-weight:700;letter-spacing:0.5px;
+}
+.badge-itransformer{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(168,85,247,0.4)}
+.badge-tft{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,158,11,0.4)}
+.badge-final{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,212,255,0.4)}
+.badge-news{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,255,136,0.4)}
+.output-box-body{padding:16px 18px}
+
+/* ─── Metric Rows ───────────────────────────────────────────── */
+.metric-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.metric-row:last-child{border-bottom:none}
+.metric-key{font-size:12px;color:var(--text-muted)}
+.metric-val{font-size:13px;font-weight:600;color:var(--text);text-align:right}
+.metric-val.bullish{color:var(--green)}
+.metric-val.bearish{color:var(--red)}
+.metric-val.sideways{color:var(--amber)}
+.metric-val.cyan{color:var(--cyan)}
+.metric-val.purple{color:var(--purple)}
+
+/* ─── Signal Badge ──────────────────────────────────────────── */
+.signal-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 20px;border-radius:30px;font-size:18px;font-weight:800;
+  letter-spacing:1px;
+}
+.signal-badge.BUY{background:var(--green-dim);color:var(--green);border:2px solid var(--green);box-shadow:var(--glow-green)}
+.signal-badge.SELL{background:var(--red-dim);color:var(--red);border:2px solid var(--red);box-shadow:var(--glow-red)}
+.signal-badge.HOLD{background:var(--amber-dim);color:var(--amber);border:2px solid var(--amber);box-shadow:0 0 20px rgba(245,158,11,0.3)}
+
+/* ─── Prediction Table ──────────────────────────────────────── */
+.pred-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+.pred-table th{
+  text-align:center;padding:7px 8px;color:var(--text-muted);
+  font-size:10px;text-transform:uppercase;letter-spacing:0.5px;
+  border-bottom:1px solid var(--border);
+}
+.pred-table td{
+  text-align:center;padding:7px 8px;border-bottom:1px solid rgba(255,255,255,0.03);
+}
+.pred-table tbody tr:last-child td{border-bottom:none}
+.pred-table .day-label{color:var(--text-muted);font-weight:600}
+.pred-table .itx-price{color:var(--purple)}
+.pred-table .tft-price{color:var(--amber)}
+.pred-table .avg-price{color:var(--cyan);font-weight:700}
+
+/* ─── Feature Tags ──────────────────────────────────────────── */
+.feature-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.feature-tag{
+  font-size:10px;padding:3px 8px;border-radius:4px;
+  background:rgba(255,255,255,0.05);color:var(--text-muted);border:1px solid var(--border);
+}
+
+/* ─── Charts Output ─────────────────────────────────────────── */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.chart-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;
+}
+.chart-card-title{
+  padding:12px 16px;font-size:12px;font-weight:700;color:var(--text-dim);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:6px;
+}
+.chart-card-title::before{
+  content:'';width:8px;height:8px;border-radius:50%;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+}
+.chart-inner{height:220px}
+
+/* ─── Explanation / Risk Box ────────────────────────────────── */
+.explanation-box{
+  padding:14px 16px;border-radius:10px;
+  background:rgba(0,212,255,0.04);
+  border:1px solid rgba(0,212,255,0.15);
+  font-size:13px;color:var(--text-dim);line-height:1.7;
+  margin-top:8px;
+}
+.risk-box{
+  padding:12px 16px;border-radius:10px;
+  background:rgba(255,68,102,0.05);
+  border:1px solid rgba(255,68,102,0.2);
+  font-size:12px;color:var(--text-dim);line-height:1.6;
+  margin-top:8px;
+}
+.risk-box strong{color:var(--red)}
+
+/* ─── Empty State ───────────────────────────────────────────── */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 20px;color:var(--text-muted);gap:12px;text-align:center;
+}
+.empty-state .icon{font-size:48px;opacity:0.3}
+.empty-state h3{font-size:18px;color:var(--text-dim)}
+.empty-state p{font-size:14px;max-width:340px;line-height:1.6}
+
+/* ─── News Headline ─────────────────────────────────────────── */
+.headline-text{
+  font-size:12px;color:var(--text-dim);line-height:1.6;padding:8px 0;
+  border-top:1px solid rgba(255,255,255,0.05);margin-top:8px;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#2d3f5c}
+
+/* ─── Animations ────────────────────────────────────────────── */
+@keyframes fadeInUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.fade-in{animation:fadeInUp 0.4s ease forwards}
+
+/* ─── Responsive ────────────────────────────────────────────── */
+@media(max-width:1100px){
+  .main-grid{grid-template-columns:1fr}
+  .charts-grid{grid-template-columns:1fr}
+  .output-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ════ HEADER ════════════════════════════════════════════════ -->
+<div class="container">
+<header>
+  <div class="logo">
+    <div class="logo-icon">🧠</div>
+    <div>
+      <h1>Stock<span>LLM</span></h1>
+      <div style="font-size:11px;color:var(--text-muted)">AI-Powered Market Intelligence</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    NSE India &nbsp;·&nbsp; iTransformer + TFT Models &nbsp;·&nbsp;
+    <span id="live-time">—</span>
+  </div>
+</header>
+
+<!-- ════ MAIN GRID ═════════════════════════════════════════════ -->
+<div class="main-grid">
+
+  <!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+  <aside class="sidebar">
+
+    <!-- Stock Info -->
+    <div class="stock-info-card">
+      <div class="card-title">Target Stock</div>
+      <div class="stock-ticker-display">
+        <div class="ticker-icon">📈</div>
+        <div>
+          <div class="ticker-name">Reliance Industries</div>
+          <div class="ticker-sym">RELIANCE.NS · NSE</div>
+        </div>
+      </div>
+      <div class="stock-meta-row">
+        <span class="stock-meta-tag">15-Year Data</span>
+        <span class="stock-meta-tag">5-Day Forecast</span>
+        <span class="stock-meta-tag">iTransformer + TFT</span>
+      </div>
+    </div>
+
+    <!-- Predict Button -->
+    <button class="run-btn" id="run-btn" onclick="startPredict()">
+      🔮 &nbsp;Predict
+    </button>
+
+    <!-- Progress -->
+    <div class="card progress-section" id="progress-section">
+      <div class="card-title">Pipeline Progress</div>
+      <div class="overall-progress">
+        <div class="overall-label">
+          <span>Overall</span>
+          <strong id="overall-pct">0%</strong>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="overall-bar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="stage-list" id="stage-list">
+        {% for key, stage in stages %}
+        <div class="stage-item" id="stage-{{ key }}">
+          <div class="stage-header">
+            <span class="stage-name">
+              <span class="stage-status-dot" id="dot-{{ key }}"></span>
+              {{ stage.label }}
+            </span>
+            <span class="stage-pct" id="pct-{{ key }}">0%</span>
+          </div>
+          <div class="stage-bar">
+            <div class="stage-bar-fill {{ key }}" id="bar-{{ key }}" style="width:0%"></div>
+          </div>
+          <div class="stage-message" id="msg-{{ key }}"></div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Log Console -->
+      <div style="margin-top:12px">
+        <div class="card-title" style="margin-bottom:8px">Console</div>
+        <div class="log-console" id="log-console">
+          <div class="log-line info">Press Predict to start…</div>
+        </div>
+      </div>
+    </div>
+
+  </aside><!-- /sidebar -->
+
+  <!-- ── CONTENT ─────────────────────────────────────────────── -->
+  <main class="content-area">
+
+    <!-- OHLC Chart -->
+    <div class="ohlc-card">
+      <div class="ohlc-header">
+        <h2>
+          📊 Price History (2 Months · Daily)
+          <span class="ticker-badge" id="ohlc-ticker-badge">RELIANCE.NS</span>
+        </h2>
+        <div class="ohlc-hint">OHLC Candlestick · Volume Bars</div>
+      </div>
+      <div id="ohlc-chart">
+        <div class="ohlc-placeholder">
+          <div class="icon">📈</div>
+          <p>Loading chart for RELIANCE.NS…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty / Waiting State -->
+    <div class="empty-state" id="empty-state">
+      <div class="icon">🎯</div>
+      <h3>Ready to Predict</h3>
+      <p>Click <strong>Predict</strong> to download 15 years of Reliance data, load saved models, and forecast the next 5 trading days.</p>
+    </div>
+
+    <!-- Output Section -->
+    <div class="output-section" id="output-section">
+
+      <!-- Final Summary Card -->
+      <div class="output-box final" id="final-box">
+        <div class="output-box-header">
+          <div class="output-box-title">
+            🎯 Final Prediction Output
+            <span class="model-badge badge-final">CONSENSUS</span>
+          </div>
+          <div id="run-id-display" style="font-size:11px;color:var(--text-muted)"></div>
+        </div>
+        <div class="output-box-body">
+          <!-- Signal row -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+            <div>
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">SIGNAL</div>
+              <div class="signal-badge" id="signal-badge">—</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">TREND</div>
+              <div id="trend-display" style="font-size:22px;font-weight:800">—</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">CONFIDENCE</div>
+              <div id="confidence-display" style="font-size:26px;font-weight:800;color:var(--cyan)">—</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">PRICE TARGET</div>
+              <div id="price-target-display" style="font-size:20px;font-weight:700;color:var(--green)">—</div>
+              <div id="last-price-display" style="font-size:11px;color:var(--text-muted)">Last: —</div>
+            </div>
+          </div>
+
+          <!-- Prediction table -->
+          <div style="margin-top:14px">
+            <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">5-Day Price Forecast</div>
+            <table class="pred-table">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>iTransformer</th>
+                  <th>TFT</th>
+                  <th>Average</th>
+                </tr>
+              </thead>
+              <tbody id="pred-table-body"></tbody>
+            </table>
+          </div>
+
+          <!-- Explanation -->
+          <div style="margin-top:14px">
+            <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">LLM Explanation</div>
+            <div class="explanation-box" id="explanation-text">—</div>
+          </div>
+          <div style="margin-top:10px">
+            <div class="risk-box"><strong>⚠️ Key Risk:</strong> <span id="risk-text">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model Outputs Row -->
+      <div class="output-grid" style="margin-top:16px">
+
+        <!-- iTransformer -->
+        <div class="output-box itransformer">
+          <div class="output-box-header">
+            <div class="output-box-title">
+              🧩 iTransformer
+              <span class="model-badge badge-itransformer">TRANSFORMER</span>
+            </div>
+          </div>
+          <div class="output-box-body">
+            <div class="metric-row">
+              <span class="metric-key">Predicted Prices</span>
+              <span class="metric-val purple" id="itx-prices">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Trend</span>
+              <span class="metric-val" id="itx-trend-val">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Confidence</span>
+              <span class="metric-val cyan" id="itx-conf">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Validation MAE</span>
+              <span class="metric-val" id="itx-mae">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Validation RMSE</span>
+              <span class="metric-val" id="itx-rmse">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Last Actual Price</span>
+              <span class="metric-val" id="itx-last">—</span>
+            </div>
+            <div style="margin-top:10px">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">TOP FEATURES</div>
+              <div class="feature-tags" id="itx-features"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TFT -->
+        <div class="output-box tft">
+          <div class="output-box-header">
+            <div class="output-box-title">
+              ⚡ TFT Model
+              <span class="model-badge badge-tft">TEMPORAL FUSION</span>
+            </div>
+          </div>
+          <div class="output-box-body">
+            <div class="metric-row">
+              <span class="metric-key">Predicted Prices</span>
+              <span class="metric-val" style="color:var(--amber)" id="tft-prices">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Trend</span>
+              <span class="metric-val" id="tft-trend-val">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Confidence</span>
+              <span class="metric-val cyan" id="tft-conf">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Validation MAE</span>
+              <span class="metric-val" id="tft-mae">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Validation RMSE</span>
+              <span class="metric-val" id="tft-rmse">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Last Actual Price</span>
+              <span class="metric-val" id="tft-last">—</span>
+            </div>
+            <div style="margin-top:10px">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">TOP FEATURES</div>
+              <div class="feature-tags" id="tft-features"></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /output-grid models -->
+
+      <!-- News Sentiment -->
+      <div class="output-box news-box" style="margin-top:16px">
+        <div class="output-box-header">
+          <div class="output-box-title">
+            📰 News Sentiment
+            <span class="model-badge badge-news">NLP ANALYSIS</span>
+          </div>
+          <div id="news-score" style="font-size:18px;font-weight:800"></div>
+        </div>
+        <div class="output-box-body">
+          <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+            <div>
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">SENTIMENT</div>
+              <div id="news-label" style="font-size:20px;font-weight:800">—</div>
+            </div>
+            <div style="flex:1;min-width:200px">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">SCORE</div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden">
+                  <div id="sentiment-bar" style="height:100%;border-radius:4px;width:50%;background:var(--amber);transition:width .6s"></div>
+                </div>
+                <span id="sentiment-score-val" style="font-size:13px;font-weight:700;min-width:40px">0.00</span>
+              </div>
+            </div>
+          </div>
+          <div class="headline-text" id="headline-text">—</div>
+        </div>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="charts-grid" style="margin-top:16px">
+        <div class="chart-card">
+          <div class="chart-card-title">Price Prediction Comparison</div>
+          <div class="chart-inner" id="chart-prediction"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Model Confidence & Error Metrics</div>
+          <div class="chart-inner" id="chart-metrics"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Feature Importance — iTransformer</div>
+          <div class="chart-inner" id="chart-itx-features"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Feature Importance — TFT</div>
+          <div class="chart-inner" id="chart-tft-features"></div>
+        </div>
+      </div>
+
+    </div><!-- /output-section -->
+
+  </main>
+</div><!-- /main-grid -->
+</div><!-- /container -->
+
+<!-- ════ JAVASCRIPT ═════════════════════════════════════════════ -->
+<script>
+let currentTaskId = null;
+let pollInterval  = null;
+let isRunning     = false;
+
+// ── Live Clock ───────────────────────────────────────────────
+function updateClock(){
+  const now = new Date();
+  document.getElementById("live-time").textContent =
+    now.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",second:"2-digit"}) + " IST";
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ── Load OHLC on page load ───────────────────────────────────
+window.addEventListener("load", () => { loadOHLC(); });
+
+// ── OHLC Chart ───────────────────────────────────────────────
+function loadOHLC(){
+  const el = document.getElementById("ohlc-chart");
+  el.innerHTML = `<div class="ohlc-placeholder"><div class="icon">⏳</div><p>Loading chart for RELIANCE.NS…</p></div>`;
+  fetch("/api/ohlc/")
+    .then(r => r.json())
+    .then(d => renderOHLC(d.data, "RELIANCE.NS"))
+    .catch(() => {
+      el.innerHTML = `<div class="ohlc-placeholder"><div class="icon">⚠️</div><p>Chart unavailable — click Predict to download data first.</p></div>`;
+    });
+}
+
+function renderOHLC(data, ticker){
+  const el = document.getElementById("ohlc-chart");
+  if(!data || !data.length){
+    el.innerHTML = `<div class="ohlc-placeholder"><div class="icon">📭</div><p>No cached data yet. Click Predict to download.</p></div>`;
+    return;
+  }
+
+  const dates  = data.map(r => r.date);
+  const open   = data.map(r => r.open);
+  const high   = data.map(r => r.high);
+  const low    = data.map(r => r.low);
+  const close  = data.map(r => r.close);
+  const volume = data.map(r => r.volume);
+
+  const traces = [
+    {
+      type:"candlestick", name: ticker,
+      x:dates, open, high, low, close,
+      increasing:{line:{color:"#00ff88"},fillcolor:"rgba(0,255,136,0.3)"},
+      decreasing:{line:{color:"#ff4466"},fillcolor:"rgba(255,68,102,0.3)"},
+      xaxis:"x", yaxis:"y",
+    },
+    {
+      type:"bar", name:"Volume",
+      x:dates, y:volume,
+      marker:{color:"rgba(0,212,255,0.2)",line:{color:"rgba(0,212,255,0.4)",width:1}},
+      xaxis:"x", yaxis:"y2",
+    }
+  ];
+
+  const layout = {
+    paper_bgcolor:"transparent", plot_bgcolor:"transparent",
+    margin:{l:60,r:20,t:10,b:60},
+    xaxis:{
+      gridcolor:"rgba(30,45,71,0.6)",linecolor:"#1e2d47",
+      tickfont:{size:10,color:"#64748b"},
+      rangeslider:{visible:false},
+    },
+    yaxis:{
+      gridcolor:"rgba(30,45,71,0.6)",linecolor:"#1e2d47",
+      tickfont:{size:10,color:"#64748b"},
+      title:{text:"Price (₹)",font:{size:10,color:"#64748b"}},
+      domain:[0.25,1],
+    },
+    yaxis2:{
+      gridcolor:"rgba(30,45,71,0.3)",linecolor:"#1e2d47",
+      tickfont:{size:9,color:"#475569"},
+      title:{text:"Volume",font:{size:9,color:"#475569"}},
+      domain:[0,0.2],
+    },
+    showlegend:false,
+    font:{color:"#94a3b8"},
+    hoverlabel:{bgcolor:"#1a2236",bordercolor:"#1e2d47",font:{color:"#e2e8f0",size:11}},
+  };
+
+  Plotly.newPlot("ohlc-chart", traces, layout, {displayModeBar:false, responsive:true});
+}
+
+// ── Predict ──────────────────────────────────────────────────
+function startPredict(){
+  if(isRunning) return;   // guard against double-clicks
+  isRunning = true;
+  const btn = document.getElementById("run-btn");
+  btn.disabled = true;
+  btn.classList.add("running");
+  btn.textContent = "⏳  Running…";
+
+  document.getElementById("progress-section").classList.add("visible");
+  document.getElementById("output-section").classList.remove("visible");
+  document.getElementById("empty-state").style.display = "none";
+
+  // Reset all stage bars
+  ["data_download","feature_eng","itransformer","tft","news","orchestrator"].forEach(k => {
+    const bar = document.getElementById(`bar-${k}`);
+    const pct = document.getElementById(`pct-${k}`);
+    const msg = document.getElementById(`msg-${k}`);
+    const dot = document.getElementById(`dot-${k}`);
+    if(bar) bar.style.width = "0%";
+    if(pct) pct.textContent = "0%";
+    if(msg) msg.textContent = "";
+    if(dot) dot.className = "stage-status-dot";
+  });
+  document.getElementById("overall-bar").style.width = "0%";
+  document.getElementById("overall-pct").textContent = "0%";
+  document.getElementById("log-console").innerHTML = '<div class="log-line info">Starting prediction pipeline…</div>';
+
+  fetch("/api/run/", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({})
+  })
+  .then(r => r.json())
+  .then(d => {
+    currentTaskId = d.task_id;
+    addLog(`Task ID: ${d.task_id}`, "info");
+    startPolling();
+  })
+  .catch(e => {
+    addLog(`Error: ${e.message}`, "error");
+    resetRunBtn();
+  });
+}
+
+// ── Polling ───────────────────────────────────────────────────
+function startPolling(){
+  if(pollInterval) clearInterval(pollInterval);
+  pollInterval = setInterval(pollProgress, 1200);
+}
+
+function pollProgress(){
+  if(!currentTaskId) return;
+  fetch(`/api/progress/${currentTaskId}/`)
+    .then(r => r.json())
+    .then(d => {
+      updateProgress(d);
+      if(d.status === "complete"){
+        clearInterval(pollInterval);
+        fetchResults();
+        resetRunBtn(true);
+        loadOHLC(); // Refresh candlestick with fresh data
+      } else if(d.status === "error"){
+        clearInterval(pollInterval);
+        addLog(`Pipeline error: ${d.error}`, "error");
+        resetRunBtn(false);
+      }
+    })
+    .catch(() => {});
+}
+
+function updateProgress(d){
+  // Overall
+  document.getElementById("overall-bar").style.width = d.overall_pct + "%";
+  document.getElementById("overall-pct").textContent  = d.overall_pct + "%";
+
+  // Stages
+  for(const [key, stage] of Object.entries(d.stages)){
+    const dot = document.getElementById(`dot-${key}`);
+    const bar = document.getElementById(`bar-${key}`);
+    const pct = document.getElementById(`pct-${key}`);
+    const msg = document.getElementById(`msg-${key}`);
+    if(!dot) continue;
+    dot.className = "stage-status-dot " + (stage.status || "");
+    if(bar) bar.style.width = stage.pct + "%";
+    if(pct) pct.textContent = stage.pct + "%";
+    if(msg) msg.textContent = stage.message || "";
+  }
+
+  // Log lines
+  if(d.log_tail && d.log_tail.length){
+    const el = document.getElementById("log-console");
+    el.innerHTML = d.log_tail.map(l => {
+      const cls = l.includes("✅") || l.includes("complete") ? "success"
+                : l.includes("⚠️") || l.includes("Warning") ? "warning"
+                : l.includes("Error") || l.includes("error") ? "error" : "info";
+      return `<div class="log-line ${cls}">${escHtml(l)}</div>`;
+    }).join("");
+    el.scrollTop = el.scrollHeight;
+  }
+}
+
+// ── Fetch & Render Results ────────────────────────────────────
+function fetchResults(){
+  fetch(`/api/results/${currentTaskId}/`)
+    .then(r => r.json())
+    .then(d => { if(d.result) renderResults(d.result); })
+    .catch(() => {});
+}
+
+function renderResults(r){
+  document.getElementById("output-section").classList.add("visible");
+  document.getElementById("empty-state").style.display = "none";
+
+  document.getElementById("run-id-display").textContent = `Run ID: ${r.run_id || "—"}`;
+
+  const signalEl = document.getElementById("signal-badge");
+  signalEl.textContent = r.signal;
+  signalEl.className   = `signal-badge ${r.signal}`;
+
+  const trendEl = document.getElementById("trend-display");
+  trendEl.textContent = (r.trend==="Bullish"?"📈 ":r.trend==="Bearish"?"📉 ":"➡️ ") + r.trend;
+  trendEl.style.color = r.trend==="Bullish"?"var(--green)":r.trend==="Bearish"?"var(--red)":"var(--amber)";
+
+  const confPct = ((r.confidence||0)*100).toFixed(1);
+  document.getElementById("confidence-display").textContent   = confPct + "%";
+  document.getElementById("price-target-display").textContent = "₹" + (r.price_target||0).toFixed(2);
+  document.getElementById("last-price-display").textContent   = "Last: ₹" + (r.last_price||0).toFixed(2);
+
+  const itx  = (r.predicted_prices||{}).itransformer || [];
+  const tft  = (r.predicted_prices||{}).tft || [];
+  const avg  = (r.predicted_prices||{}).average || [];
+  const tbody = document.getElementById("pred-table-body");
+  tbody.innerHTML = "";
+  for(let i=0;i<5;i++){
+    tbody.innerHTML += `
+      <tr>
+        <td class="day-label">D+${i+1}</td>
+        <td class="itx-price">${itx[i]!=null?"₹"+itx[i].toFixed(2):"—"}</td>
+        <td class="tft-price">${tft[i]!=null?"₹"+tft[i].toFixed(2):"—"}</td>
+        <td class="avg-price">${avg[i]!=null?"₹"+avg[i].toFixed(2):"—"}</td>
+      </tr>`;
+  }
+
+  document.getElementById("explanation-text").textContent = r.explanation || "—";
+  document.getElementById("risk-text").textContent        = r.key_risks   || "—";
+
+  // iTransformer box
+  document.getElementById("itx-prices").textContent = itx.map(p=>"₹"+p.toFixed(2)).join(", ") || "—";
+  document.getElementById("itx-mae").textContent    = r.metrics?.itransformer_mae?.toFixed(4)  || "—";
+  document.getElementById("itx-rmse").textContent   = r.metrics?.itransformer_rmse?.toFixed(4) || "—";
+  document.getElementById("itx-last").textContent   = "₹" + (r.last_price||0).toFixed(2);
+  document.getElementById("itx-conf").textContent   = confPct + "%";
+
+  const itxFeats = (r.important_features||{}).itransformer || [];
+  document.getElementById("itx-features").innerHTML = itxFeats.map(f=>`<span class="feature-tag">${f}</span>`).join("");
+
+  // TFT box
+  document.getElementById("tft-prices").textContent = tft.map(p=>"₹"+p.toFixed(2)).join(", ") || "—";
+  document.getElementById("tft-last").textContent   = "₹" + (r.last_price||0).toFixed(2);
+  document.getElementById("tft-conf").textContent   = confPct + "%";
+  document.getElementById("tft-mae").textContent    = "—";
+  document.getElementById("tft-rmse").textContent   = "—";
+
+  const tftFeats = (r.important_features||{}).tft || [];
+  document.getElementById("tft-features").innerHTML = tftFeats.map(f=>`<span class="feature-tag">${f}</span>`).join("");
+
+  const trendColor = r.trend==="Bullish"?"var(--green)":r.trend==="Bearish"?"var(--red)":"var(--amber)";
+  ["itx-trend-val","tft-trend-val"].forEach(id => {
+    const el = document.getElementById(id);
+    if(el){ el.textContent = r.trend; el.style.color = trendColor; }
+  });
+
+  // News
+  const news = r.news || {};
+  const sentiment = news.sentiment_label || "Neutral";
+  const score     = news.sentiment_score || 0;
+  document.getElementById("news-label").textContent      = sentiment;
+  document.getElementById("news-score").textContent      = (score>=0?"+":"") + score.toFixed(3);
+  document.getElementById("news-score").style.color      = score>0.05?"var(--green)":score<-0.05?"var(--red)":"var(--amber)";
+  document.getElementById("news-label").style.color      = sentiment==="Positive"?"var(--green)":sentiment==="Negative"?"var(--red)":"var(--amber)";
+  document.getElementById("sentiment-score-val").textContent = (score>=0?"+":"") + score.toFixed(3);
+  document.getElementById("headline-text").textContent   = news.headline_summary || "—";
+
+  const barPct  = Math.min(100, Math.max(0, (score + 1) / 2 * 100));
+  const sentBar = document.getElementById("sentiment-bar");
+  sentBar.style.width      = barPct + "%";
+  sentBar.style.background = score>0.05?"var(--green)":score<-0.05?"var(--red)":"var(--amber)";
+
+  // Charts
+  renderPredictionChart(r.last_price, itx, tft, avg);
+  renderMetricsChart(r);
+  renderFeatureChart("chart-itx-features", itxFeats, "var(--purple)");
+  renderFeatureChart("chart-tft-features", tftFeats, "var(--amber)");
+
+  setTimeout(() => document.getElementById("output-section").scrollIntoView({behavior:"smooth"}), 200);
+}
+
+function renderPredictionChart(lastPrice, itx, tft, avg){
+  const days   = ["D+1","D+2","D+3","D+4","D+5"];
+  const layout = darkLayout("Price (₹)");
+  const traces = [];
+
+  if(lastPrice){
+    traces.push({
+      x:["D+0",...days], y:[lastPrice,...itx],
+      mode:"lines+markers", name:"iTransformer",
+      line:{color:"#a855f7",width:2}, marker:{size:6},
+    });
+    traces.push({
+      x:["D+0",...days], y:[lastPrice,...tft],
+      mode:"lines+markers", name:"TFT",
+      line:{color:"#f59e0b",width:2}, marker:{size:6},
+    });
+    traces.push({
+      x:["D+0",...days], y:[lastPrice,...avg],
+      mode:"lines+markers", name:"Average",
+      line:{color:"#00d4ff",width:3,dash:"dot"}, marker:{size:8},
+    });
+    traces.push({
+      x:["D+0",...days], y:Array(6).fill(lastPrice),
+      mode:"lines", name:"Last Price",
+      line:{color:"rgba(255,255,255,0.2)",width:1,dash:"dash"},
+    });
+  }
+  Plotly.newPlot("chart-prediction", traces, layout, {displayModeBar:false,responsive:true});
+}
+
+function renderMetricsChart(r){
+  const mae  = r.metrics?.itransformer_mae  || 0;
+  const rmse = r.metrics?.itransformer_rmse || 0;
+  const conf = (r.confidence || 0) * 100;
+  const traces = [{
+    type:"bar",
+    x:["iTransformer MAE","iTransformer RMSE","Confidence (%)"],
+    y:[mae, rmse, conf],
+    marker:{color:["#a855f7","#3b82f6","#00d4ff"],opacity:0.85},
+    text:[mae.toFixed(2), rmse.toFixed(2), conf.toFixed(1)+"%"],
+    textposition:"auto", textfont:{color:"#e2e8f0",size:11},
+  }];
+  Plotly.newPlot("chart-metrics", traces, darkLayout("Value"), {displayModeBar:false,responsive:true});
+}
+
+function renderFeatureChart(elId, features, color){
+  if(!features || !features.length) return;
+  const scores = features.map((_,i) => features.length - i);
+  const traces = [{
+    type:"bar", orientation:"h",
+    x: scores.slice().reverse(),
+    y: [...features].reverse(),
+    marker:{color, opacity:0.8},
+    text: scores.slice().reverse().map(s=>s),
+    textposition:"auto", textfont:{color:"#e2e8f0",size:10},
+  }];
+  const layout = {
+    ...darkLayout("Importance"),
+    margin:{l:100,r:20,t:10,b:30},
+    yaxis:{...darkLayout().yaxis, tickfont:{size:10}},
+  };
+  Plotly.newPlot(elId, traces, layout, {displayModeBar:false,responsive:true});
+}
+
+function darkLayout(ytitle=""){
+  return {
+    paper_bgcolor:"transparent", plot_bgcolor:"transparent",
+    font:{color:"#94a3b8",size:10},
+    margin:{l:50,r:20,t:10,b:40},
+    legend:{bgcolor:"transparent",font:{color:"#94a3b8",size:10}},
+    xaxis:{gridcolor:"rgba(30,45,71,0.8)",linecolor:"#1e2d47",tickfont:{size:10},zerolinecolor:"#1e2d47"},
+    yaxis:{gridcolor:"rgba(30,45,71,0.8)",linecolor:"#1e2d47",tickfont:{size:10},title:{text:ytitle,font:{size:10}},zerolinecolor:"#1e2d47"},
+    hovermode:"x unified",
+    hoverlabel:{bgcolor:"#1a2236",bordercolor:"#1e2d47",font:{color:"#e2e8f0",size:11}},
+  };
+}
+
+function addLog(msg, cls="info"){
+  const el = document.getElementById("log-console");
+  el.innerHTML += `<div class="log-line ${cls}">${escHtml(msg)}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function escHtml(s){
+  return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function resetRunBtn(success=false){
+  isRunning = false;
+  const btn = document.getElementById("run-btn");
+  btn.disabled  = false;
+  btn.classList.remove("running");
+  btn.textContent = success ? "✅  Predict Again" : "🔮  Predict";
+}
+</script>
+</body>
+</html>

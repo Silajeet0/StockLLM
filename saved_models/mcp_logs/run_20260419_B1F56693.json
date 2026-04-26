@@ -1,0 +1,77 @@
+{
+  "run_id": "B1F56693",
+  "timestamp": "2026-04-19T16:17:49.048682+00:00",
+  "ticker": "RELIANCE.NS",
+  "company": "Reliance Industries",
+  "last_price": 1365.0,
+  "models": {
+    "itransformer": {
+      "model": "iTransformer",
+      "predicted_prices": [
+        1322.1062,
+        1319.5303,
+        1273.4741,
+        1299.1038,
+        1300.1945
+      ],
+      "trend": "Bearish",
+      "confidence": 0.8861,
+      "important_features": [
+        "macd_hist",
+        "open",
+        "bb_lower",
+        "volatility",
+        "close"
+      ],
+      "val_mae": 82.3579,
+      "val_rmse": 98.1329,
+      "last_actual_price": 1365.0
+    },
+    "tft": {
+      "model": "TFT",
+      "predicted_prices": [
+        1429.2202,
+        1418.5126,
+        1417.5675,
+        1415.0129,
+        1410.7156
+      ],
+      "trend": "Bullish",
+      "confidence": 0.9463,
+      "important_features": [
+        "month",
+        "ema_20",
+        "sma_20",
+        "low",
+        "high"
+      ],
+      "val_mae": 38.8175,
+      "val_rmse": 47.6897,
+      "last_actual_price": 1365.0
+    }
+  },
+  "news": {
+    "sentiment_label": "Neutral",
+    "sentiment_score": 0.032,
+    "headline_summary": "How The Story On Reliance Industries (NSEI:RELIANCE) Is Shifting As Analysts Rework Fair Value | HBO Max comes to India via exclusive JioHotstar deal | India permits Iranian oil tankers to berth for Reliance, sources say",
+    "num_articles": 30
+  },
+  "llm_interpretation": {
+    "signal": "HOLD",
+    "final_trend": "Sideways",
+    "confidence": 0.5703,
+    "price_target": 1372.11,
+    "explanation": "The models disagree on direction, and the news sentiment analysis indicates a neutral overall sentiment. The iTransformer model has lower validation error than the TFT model, but neither suggests a strong trend. Therefore, holding the current position is the most conservative approach.",
+    "model_agreement": false,
+    "key_risks": "The stock's price may be influenced by market volatility and unexpected news events."
+  },
+  "consensus": {
+    "signal": "HOLD",
+    "trend": "Sideways",
+    "confidence": 0.5793,
+    "price_target": 1361.01,
+    "agreement": false
+  },
+  "status": "success",
+  "errors": []
+}

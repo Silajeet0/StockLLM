@@ -1,0 +1,79 @@
+{
+  "run_id": "2489F098",
+  "timestamp": "2026-04-19T18:37:46.025596+00:00",
+  "ticker": "RELIANCE.NS",
+  "company": "Reliance Industries",
+  "last_price": 1365.0,
+  "models": {
+    "itransformer": {
+      "model": "iTransformer",
+      "predicted_prices": [
+        1330.9247,
+        1281.3291,
+        1330.0593,
+        1296.549,
+        1349.1776
+      ],
+      "trend": "Bearish",
+      "confidence": 0.8879,
+      "signal_strength": null,
+      "important_features": [
+        "returns",
+        "ema_20",
+        "sma_20",
+        "high",
+        "bb_middle"
+      ],
+      "val_mae": 81.0363,
+      "val_rmse": 98.4185,
+      "last_actual_price": 1365.0
+    },
+    "tft": {
+      "model": "TFT",
+      "predicted_prices": [
+        1355.4811,
+        1352.9512,
+        1348.6672,
+        1343.6753,
+        1338.9901
+      ],
+      "trend": "Bearish",
+      "confidence": 0.9425,
+      "signal_strength": null,
+      "important_features": [
+        "macd_signal",
+        "close",
+        "low",
+        "day_of_month",
+        "bb_upper"
+      ],
+      "val_mae": 41.5864,
+      "val_rmse": 52.1258,
+      "last_actual_price": 1365.0
+    }
+  },
+  "news": {
+    "sentiment_label": "Neutral",
+    "sentiment_score": 0.032,
+    "headline_summary": "How The Story On Reliance Industries (NSEI:RELIANCE) Is Shifting As Analysts Rework Fair Value | HBO Max comes to India via exclusive JioHotstar deal | India permits Iranian oil tankers to berth for Reliance, sources say",
+    "num_articles": 30
+  },
+  "llm_interpretation": {
+    "signal": "HOLD",
+    "final_trend": "Sideways",
+    "confidence": 0.695,
+    "price_target": 1365.0,
+    "explanation": "The models disagree on direction, but both indicate a bearish trend with low confidence. The news sentiment analysis is neutral, and the key driving features do not suggest a strong reason to buy or sell. Therefore, holding the current position seems like the most prudent decision.",
+    "model_agreement": false,
+    "key_risks": "The main risk to this prediction is that the models' disagreement may be due to overfitting or data quality issues, which could lead to incorrect predictions in the future."
+  },
+  "consensus": {
+    "signal": "SELL",
+    "trend": "Bearish",
+    "confidence": 0.8092,
+    "price_target": 1351.06,
+    "agreement": true
+  },
+  "status": "success",
+  "errors": []
+}

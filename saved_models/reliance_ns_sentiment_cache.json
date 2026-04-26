@@ -1,0 +1,15 @@
+{
+  "sentiment_label": "Negative",
+  "sentiment_score": -0.5241,
+  "headline_summary": "Ambani's Reliance posts quarterly profit drop, misses street view | Indian court extends detention of aviation official, Reliance exec in bribery case | Factbox-India's Asteria, the Reliance unit at the centre of a bribery scandal",
+  "num_articles": 30,
+  "source_breakdown": {
+    "Reuters": 7,
+    "Simply Wall St.": 2,
+    "TechCrunch": 1,
+    "Google News": 15,
+    "Economic Times": 5
+  },
+  "model_used": "finbert",
+  "_cached_at": "2026-04-26T14:12:20.013426+00:00"
+}

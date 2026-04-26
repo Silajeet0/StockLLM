@@ -1,0 +1,79 @@
+{
+  "run_id": "5F13B015",
+  "timestamp": "2026-04-20T06:22:41.360014+00:00",
+  "ticker": "RELIANCE.NS",
+  "company": "Reliance Industries Limited",
+  "last_price": 1365.0,
+  "models": {
+    "itransformer": {
+      "model": "iTransformer",
+      "predicted_prices": [
+        1297.7754,
+        1260.235,
+        1312.1447,
+        1281.0984,
+        1307.5282
+      ],
+      "trend": "Bearish",
+      "confidence": 0.8785,
+      "signal_strength": null,
+      "important_features": [
+        "macd_hist",
+        "macd",
+        "macd_signal",
+        "open",
+        "adj_close"
+      ],
+      "val_mae": 87.8844,
+      "val_rmse": 104.3151,
+      "last_actual_price": 1365.0
+    },
+    "tft": {
+      "model": "TFT",
+      "predicted_prices": [
+        1318.5792,
+        1322.6326,
+        1318.9594,
+        1313.0177,
+        1307.2292
+      ],
+      "trend": "Bearish",
+      "confidence": 0.9228,
+      "signal_strength": null,
+      "important_features": [
+        "close",
+        "bb_upper",
+        "sma_20",
+        "atr",
+        "macd_hist"
+      ],
+      "val_mae": 55.8319,
+      "val_rmse": 66.3413,
+      "last_actual_price": 1365.0
+    }
+  },
+  "news": {
+    "sentiment_label": "Neutral",
+    "sentiment_score": 0.0419,
+    "headline_summary": "How The Story On Reliance Industries (NSEI:RELIANCE) Is Shifting As Analysts Rework Fair Value | HBO Max comes to India via exclusive JioHotstar deal | India permits Iranian oil tankers to berth for Reliance, sources say",
+    "num_articles": 30
+  },
+  "llm_interpretation": {
+    "signal": "HOLD",
+    "final_trend": "Bearish",
+    "confidence": 0.6908,
+    "price_target": 1307.5282,
+    "explanation": "Models disagree on direction, but both indicate a bearish trend. The news sentiment analysis is neutral, which suggests caution is needed. Holding the position may be prudent given the uncertainty in model predictions.",
+    "model_agreement": false,
+    "key_risks": "The main risk to this prediction is that the models' disagreement could lead to incorrect signal generation, potentially resulting in a loss if not managed properly."
+  },
+  "consensus": {
+    "signal": "SELL",
+    "trend": "Bearish",
+    "confidence": 0.7997,
+    "price_target": 1307.43,
+    "agreement": true
+  },
+  "status": "success",
+  "errors": []
+}

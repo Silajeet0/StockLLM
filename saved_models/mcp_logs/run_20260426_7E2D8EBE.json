@@ -1,0 +1,79 @@
+{
+  "run_id": "7E2D8EBE",
+  "timestamp": "2026-04-26T14:12:20.014013+00:00",
+  "ticker": "RELIANCE.NS",
+  "company": "Reliance Industries Limited",
+  "last_price": 1343.4,
+  "models": {
+    "itransformer": {
+      "model": "iTransformer",
+      "predicted_prices": [
+        1291.4515,
+        1253.6232,
+        1313.5613,
+        1287.0881,
+        1310.2662
+      ],
+      "trend": "Bearish",
+      "confidence": 0.8781,
+      "signal_strength": null,
+      "important_features": [
+        "macd_signal",
+        "macd",
+        "returns",
+        "adj_close",
+        "macd_hist"
+      ],
+      "val_mae": 88.1699,
+      "val_rmse": 105.5305,
+      "last_actual_price": 1343.4
+    },
+    "tft": {
+      "model": "TFT",
+      "predicted_prices": [
+        1444.1552,
+        1446.349,
+        1443.8271,
+        1440.2242,
+        1435.1582
+      ],
+      "trend": "Bullish",
+      "confidence": 0.9483,
+      "signal_strength": null,
+      "important_features": [
+        "month",
+        "ema_20",
+        "sma_20",
+        "low",
+        "high"
+      ],
+      "val_mae": 37.4231,
+      "val_rmse": 46.29,
+      "last_actual_price": 1343.4001
+    }
+  },
+  "news": {
+    "sentiment_label": "Negative",
+    "sentiment_score": -0.5241,
+    "headline_summary": "Ambani's Reliance posts quarterly profit drop, misses street view | Indian court extends detention of aviation official, Reliance exec in bribery case | Factbox-India's Asteria, the Reliance unit at the centre of a bribery scandal",
+    "num_articles": 30
+  },
+  "llm_interpretation": {
+    "signal": "HOLD",
+    "final_trend": "Sideways",
+    "confidence": 0.886995,
+    "price_target": 1372.71,
+    "explanation": "iTransformer predicts a Bearish trend (signal strength -0.31\u03c3) while TFT predicts Bullish (signal strength +1.98\u03c3). Model disagreement warrants caution \u2014 HOLD is prudent. News sentiment is negative (score -0.52).",
+    "model_agreement": false,
+    "key_risks": "Model disagreement and market volatility are the primary risks."
+  },
+  "consensus": {
+    "signal": "HOLD",
+    "trend": "Sideways",
+    "confidence": 0.6284,
+    "price_target": 1372.71,
+    "agreement": false
+  },
+  "status": "success",
+  "errors": []
+}
