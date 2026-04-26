@@ -149,7 +149,13 @@ python3 -m venv env
 source env/bin/activate
 
 # 3. Install dependencies
+#(FOR MACHINES WITH CPU ONLY)
 pip install -r requirements.txt
+pip install -r requirements-cpu.txt
+
+#(FOR MACHINES WITH GPU)
+pip install -r requirements.txt
+pip install -r requirements-gpu.txt
 
 # 4. Install GUI dependencies
 pip install -r gui/requirements_gui.txt
